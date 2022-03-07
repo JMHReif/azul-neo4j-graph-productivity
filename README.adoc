@@ -14,24 +14,24 @@ The application is packaged and built into a Docker container that includes http
 
 == Steps to reproduce
 
-1. Clone this repository from Github to your local machine.
-2. Create an instance of Neo4j (free cloud https://dev.neo4j.com/neo4j-aura[AuraDB instances available^]!)
-3. Create an application.properties file somewhere on your machine with the following properties:
+* Clone this repository from Github to your local machine.
+* Create an instance of Neo4j (free cloud https://dev.neo4j.com/neo4j-aura[AuraDB instances available^]!)
+*  Create an application.properties file somewhere on your machine with the following properties:
 ```
 spring.neo4j.uri=<databaseURI>
 spring.neo4j.authentication.username=neo4j
 spring.neo4j.authentication.password=<databasePassword>
 spring.data.neo4j.database=neo4j
 ```
-4. Build the Spring Boot application with the command below.
+* Build the Spring Boot application with the command below.
 ```
 mvn clean package
 ```
-5. Build the Docker container with the packaged Spring Boot application.
+* Build the Docker container with the packaged Spring Boot application.
 ```
 docker build --platform linux/amd64 --tag jmreif/azul-neo4j-app:v1 .
 ```
-6. Run the Docker container (also starts the Spring Boot application).
+* Run the Docker container (also starts the Spring Boot application).
 ```
 docker run --name azulNeo4j -v $HOME/Projects/docker/azul-neo4j/config:/config jmreif/azul-neo4j-app:v1
 ```
