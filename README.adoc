@@ -1,0 +1,69 @@
+= Java Developer Productivity with Graph Databases
+
+This is the demo application that coincides with the Azul/Neo4j http://azul.com/webinar-neo4j/?utm_medium=social&utm_campaign=dm-events&utm_source=Neo4j&utm_content=&utm_term=[joint webinar on March 8, 2022^]. The application uses the following technologies:
+
+* Docker
+* Spring Boot
+* Spring Data Neo4j
+
+== About
+
+Our repository contains the code for the Spring Boot application, which connects to a Neo4j databases with the https://github.com/JMHReif/graph-demo-datasets/tree/main/java-versions[Java Almanac data^] loaded.
+
+The application is packaged and built into a Docker container that includes https://hub.docker.com/r/azul/zulu-openjdk[Azul JDK^]. A cloud-based Neo4j AuraDB instance was used in the demo, but a local or containerized database could also be used. To avoid sharing sensitive connection details of the cloud database, the connection properties (Spring Boot's `application.properties` file) have been externalized from the Docker container and are read in when the container/application starts.
+
+== Steps to reproduce
+
+1. Clone this repository from Github to your local machine.
+2. Create an instance of Neo4j (free cloud https://dev.neo4j.com/neo4j-aura[AuraDB instances available^]!)
+3. Create an application.properties file somewhere on your machine with the following properties:
+```
+spring.neo4j.uri=<databaseURI>
+spring.neo4j.authentication.username=neo4j
+spring.neo4j.authentication.password=<databasePassword>
+spring.data.neo4j.database=neo4j
+```
+4. Build the Spring Boot application with the command below.
+```
+mvn clean package
+```
+5. Build the Docker container with the packaged Spring Boot application.
+```
+docker build --platform linux/amd64 --tag jmreif/azul-neo4j-app:v1 .
+```
+6. Run the Docker container (also starts the Spring Boot application).
+```
+docker run --name azulNeo4j -v $HOME/Projects/docker/azul-neo4j/config:/config jmreif/azul-neo4j-app:v1
+```
+Note: you may want to change the mounted volume path (`-v <local directory path>:/config`) after the -v and before the semicolon. This mounts a specified local directory into the container, so that we can access and edit files locally that the container can read/use.
+
+== Access endpoints to query graph data
+
+Now that the database and application are running, we can access the endpoints defined in the containerized app that query and return data from the Neo4j database. The endpoints are listed below, along with sample commands to reach them.
+
+Note: the sample commands use the https://httpie.io/[httpie command line tool^], which is similar to the `curl` command, but makes results prettier.
+
+1. *Read* - find all java versions
+```
+http :8080/versions/read
+```
+2. *Create* - insert a new Java version node
+```
+http :8080/versions/create javaVersion=19 status=DEV gaDate=2022-09-15 eolDate=2022-03-14
+```
+3. *Update* - update a Java version node
+```
+http PUT :8080/versions/update/19 javaVersion=19 status=DEV gaDate=2022-09-15 eolDate=2023-03-15
+```
+4. *Delete* - delete a Java version node
+```
+http DELETE :8080/versions/delete/19
+```
+
+== Resources
+
+//* Presentation slides: <link here>
+* Azul/Neo4j join webinar: http://azul.com/webinar-neo4j/?utm_medium=social&utm_campaign=dm-events&utm_source=Neo4j&utm_content=&utm_term=[event page^]
+* Java almanac data: https://github.com/JMHReif/graph-demo-datasets/tree/main/java-versions[Java versions import to Neo4j^]
+* DockerHub image: https://hub.docker.com/r/azul/zulu-openjdk[Azul OpenJDK^]
+* Neo4j free cloud instance: https://dev.neo4j.com/neo4j-aura[AuraDB^]
